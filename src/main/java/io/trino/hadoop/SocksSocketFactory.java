@@ -111,13 +111,13 @@ public class SocksSocketFactory
             public void connect(SocketAddress endpoint, int timeout)
                     throws IOException
             {
-                try {
-                    SocketAddress address = new InetSocketAddress(InetAddress.getByName(proxy.getHostText()), proxy.getPort());
-                    socket.connect(address, timeout);
-                }
-                catch (IOException e) {
-                    throw new IOException("Failed to connect to proxy: " + proxy, e);
-                }
+                // try {
+                    // SocketAddress address = new InetSocketAddress(InetAddress.getByName(proxy.getHostText()), proxy.getPort());
+                    // socket.connect(address, timeout);
+                // }
+                // catch (IOException e) {
+                    // throw new IOException("Failed to connect to proxy: " + proxy, e);
+                // }
 
                 InetSocketAddress address = (InetSocketAddress) endpoint;
                 String host = (address.getAddress() != null) ? toAddrString(address.getAddress()) : address.getHostString();

@@ -10,7 +10,7 @@
 
     <groupId>io.trino.hadoop</groupId>
     <artifactId>hadoop-apache</artifactId>
-    <version>3.2.0-18</version>
+    <version>3.2.0-18-HOPSFS</version>
 
     <name>hadoop-apache</name>
     <description>Shaded version of Apache Hadoop for Trino</description>
@@ -34,37 +34,63 @@
         <connection>scm:git:git://github.com/trinodb/trino-hadoop-apache.git</connection>
         <developerConnection>scm:git:git://github.com/trinodb/trino-hadoop-apache.git</developerConnection>
         <url>https://github.com/trinodb/trino-hadoop-apache</url>
-        <tag>3.2.0-18</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.targetJdk>1.8</project.build.targetJdk>
+        <project.build.targetJdk>21</project.build.targetJdk>
         <shadeBase>io.trino.hadoop.\$internal</shadeBase>
-        <dep.slf4j.version>1.7.25</dep.slf4j.version>
-        <dep.hadoop.version>3.2.0</dep.hadoop.version>
+        <dep.slf4j.version>1.7.36</dep.slf4j.version>
+        <dep.hadoop.version>3.2.0.17-EE-RC1</dep.hadoop.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Resolve version conflicts reported by enforcer -->
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.11.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.12.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>2.12.7</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
+            <groupId>io.hops</groupId>
             <artifactId>hadoop-common</artifactId>
             <version>${dep.hadoop.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
+                    <groupId>io.hops</groupId>
                     <artifactId>hadoop-mapreduce-client-app</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
+                    <groupId>io.hops</groupId>
                     <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
+                    <groupId>io.hops</groupId>
                     <artifactId>hadoop-yarn-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
+                    <groupId>io.hops</groupId>
                     <artifactId>hadoop-yarn-common</artifactId>
                 </exclusion>
                 <exclusion>
@@ -86,10 +112,6 @@
                 <exclusion>
                     <groupId>org.apache.directory.server</groupId>
                     <artifactId>apacheds-kerberos-codec</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-compress</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
@@ -136,6 +158,10 @@
                     <artifactId>jersey-servlet</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.github.pjfanning</groupId>
+                    <artifactId>jersey-json</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>javax.servlet</groupId>
                     <artifactId>javax.servlet-api</artifactId>
                 </exclusion>
@@ -164,10 +190,6 @@
                     <artifactId>jsch</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>jdk.tools</groupId>
-                    <artifactId>jdk.tools</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>dnsjava</groupId>
                     <artifactId>dnsjava</artifactId>
                 </exclusion>
@@ -184,14 +206,6 @@
                     <artifactId>paranamer</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.xerial.snappy</groupId>
-                    <artifactId>snappy-java</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.code.findbugs</groupId>
-                    <artifactId>jsr305</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
                 </exclusion>
@@ -199,14 +213,22 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-reload4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ch.qos.reload4j</groupId>
+                    <artifactId>reload4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
+            <groupId>io.hops</groupId>
             <artifactId>hadoop-hdfs</artifactId>
             <version>${dep.hadoop.version}</version>
-            <scope>runtime</scope>
+            <!-- <scope>runtime</scope> -->
             <exclusions>
                 <exclusion>
                     <groupId>commons-codec</groupId>
@@ -264,26 +286,22 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
+            <groupId>io.hops</groupId>
             <artifactId>hadoop-mapreduce-client-core</artifactId>
             <version>${dep.hadoop.version}</version>
             <scope>runtime</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
+                    <groupId>io.hops</groupId>
                     <artifactId>hadoop-yarn-common</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
+                    <groupId>io.hops</groupId>
                     <artifactId>hadoop-yarn-client</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>com.google.inject.extensions</groupId>
                     <artifactId>guice-servlet</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-annotations</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>io.netty</groupId>
@@ -293,33 +311,41 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-reload4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
+            <groupId>io.hops</groupId>
             <artifactId>hadoop-azure</artifactId>
             <version>${dep.hadoop.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>org.wildfly.openssl</groupId>
                     <artifactId>wildfly-openssl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
+            <groupId>io.hops</groupId>
             <artifactId>hadoop-azure-datalake</artifactId>
             <version>${dep.hadoop.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.wildfly.openssl</groupId>
+                    <artifactId>wildfly-openssl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+            <version>1.8.0</version>
         </dependency>
 
         <!-- discard all logging from Hadoop -->
@@ -443,7 +469,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>3.5.2</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -451,105 +477,96 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <createSourcesJar>true</createSourcesJar>
-                            <shadeSourcesContent>true</shadeSourcesContent>
+                            <!-- Skip sources JAR for faster builds -->
+                            <createSourcesJar>false</createSourcesJar>
+                            <shadeSourcesContent>false</shadeSourcesContent>
                             <dependencyReducedPomLocation>${project.build.directory}/pom.xml</dependencyReducedPomLocation>
                             <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>com.google.errorprone:error_prone_annotations</exclude>
+                                    <exclude>com.google.guava:failureaccess</exclude>
+                                    <exclude>com.google.guava:guava</exclude>
+                                    <exclude>com.google.j2objc:j2objc-annotations</exclude>
+                                    <exclude>org.checkerframework:checker-qual</exclude>
+                                    <exclude>org.xerial.snappy:snappy-java</exclude>
+                                    <exclude>org.lz4:lz4-java</exclude>
+                                    <exclude>com.squareup.okhttp3:okhttp</exclude>
+                                    <exclude>com.squareup.okio:okio</exclude>
+                                    <exclude>org.jetbrains.kotlin:kotlin-stdlib</exclude>
+                                    <exclude>org.jetbrains.kotlin:kotlin-stdlib-common</exclude>
+                                </excludes>
+                            </artifactSet>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                             </transformers>
                             <relocations>
+                                <!-- Shade all packages except org.apache.hadoop and io.hops -->
+                                <!-- Main package patterns -->
                                 <relocation>
-                                    <pattern>org.iq80.leveldb</pattern>
-                                    <shadedPattern>${shadeBase}.org.iq80.leveldb</shadedPattern>
+                                    <pattern>com.</pattern>
+                                    <shadedPattern>${shadeBase}.com.</shadedPattern>
+                                    <excludes>
+                                        <exclude>com.sun.security.**</exclude>
+                                        <exclude>com.sun.management.**</exclude>
+                                        <exclude>com.ibm.security.**</exclude>
+                                    </excludes>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.apache.http</pattern>
-                                    <shadedPattern>${shadeBase}.org.apache.http</shadedPattern>
+                                    <pattern>org.</pattern>
+                                    <shadedPattern>${shadeBase}.org.</shadedPattern>
+                                    <excludes>
+                                        <exclude>org.apache.hadoop.**</exclude>
+                                    </excludes>
                                 </relocation>
+                                <relocation>
+                                    <pattern>net.</pattern>
+                                    <shadedPattern>${shadeBase}.net.</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>io.</pattern>
+                                    <shadedPattern>${shadeBase}.io.</shadedPattern>
+                                    <excludes>
+                                        <exclude>io.hops.**</exclude>
+                                        <exclude>io.trino.**</exclude>
+                                    </excludes>
+                                </relocation>
+                                
+                                
+                                <!-- jakarta packages -->
+                                <relocation>
+                                    <pattern>jakarta.</pattern>
+                                    <shadedPattern>${shadeBase}.jakarta.</shadedPattern>
+                                </relocation>
+                                
+                                <!-- Other common root packages -->
+                                <relocation>
+                                    <pattern>ch.qos.</pattern>
+                                    <shadedPattern>${shadeBase}.ch.qos.</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>it.unimi.</pattern>
+                                    <shadedPattern>${shadeBase}.it.unimi.</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>dk.brics.</pattern>
+                                    <shadedPattern>${shadeBase}.dk.brics.</shadedPattern>
+                                </relocation>
+                                
+                                <!-- Mozilla pattern from original config -->
                                 <relocation>
                                     <pattern>mozilla</pattern>
-                                    <shadedPattern>${shadeBase}.org.apache.http.mozilla</shadedPattern>
+                                    <shadedPattern>${shadeBase}.mozilla</shadedPattern>
+                                </relocation>
+                                
+                                <!-- Root-level packages -->
+                                <relocation>
+                                    <pattern>reactor.</pattern>
+                                    <shadedPattern>${shadeBase}.reactor.</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>io.netty</pattern>
-                                    <shadedPattern>${shadeBase}.io.netty</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.eclipse.jetty</pattern>
-                                    <shadedPattern>${shadeBase}.org.eclipse.jetty</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.microsoft.azure</pattern>
-                                    <shadedPattern>${shadeBase}.com.microsoft.azure</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.avro</pattern>
-                                    <shadedPattern>${shadeBase}.org.apache.avro</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.commons</pattern>
-                                    <shadedPattern>${shadeBase}.org.apache.commons</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.kerby</pattern>
-                                    <shadedPattern>${shadeBase}.org.apache.kerby</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.htrace</pattern>
-                                    <shadedPattern>${shadeBase}.htrace</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.wildfly.openssl</pattern>
-                                    <shadedPattern>${shadeBase}.org.wildfly.openssl</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.google.common</pattern>
-                                    <shadedPattern>${shadeBase}.com.google.common</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.google.protobuf</pattern>
-                                    <shadedPattern>${shadeBase}.com.google.protobuf</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.google.gson</pattern>
-                                    <shadedPattern>${shadeBase}.com.google.gson</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.google.re2j</pattern>
-                                    <shadedPattern>${shadeBase}.com.google.re2j</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.fasterxml.jackson</pattern>
-                                    <shadedPattern>${shadeBase}.com.fasterxml.jackson</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.codehaus.jackson</pattern>
-                                    <shadedPattern>${shadeBase}.org.codehaus.jackson</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.ctc.wstx</pattern>
-                                    <shadedPattern>${shadeBase}.com.ctc.wstx</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.codehaus.stax2</pattern>
-                                    <shadedPattern>${shadeBase}.org.codehaus.stax2</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.log4j</pattern>
-                                    <shadedPattern>${shadeBase}.org.apache.log4j</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.slf4j</pattern>
-                                    <shadedPattern>${shadeBase}.org.slf4j</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.squareup.okhttp</pattern>
-                                    <shadedPattern>${shadeBase}.com.squareup.okhttp</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>okio</pattern>
-                                    <shadedPattern>${shadeBase}.okio</shadedPattern>
+                                    <pattern>google.</pattern>
+                                    <shadedPattern>${shadeBase}.google.</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>
@@ -557,21 +574,37 @@
                                     <artifact>*:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/maven/**</exclude>
+                                        <exclude>META-INF/versions/**</exclude>
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.java</exclude>
+                                        <!-- Exclude Log4j resources to prevent conflicts -->
+                                        <exclude>Log4j-charsets.properties</exclude>
+                                        <exclude>Log4j-config.xsd</exclude>
+                                        <exclude>Log4j-events.dtd</exclude>
+                                        <exclude>Log4j-events.xsd</exclude>
+                                        <exclude>Log4j-levels.xsd</exclude>
+                                        <exclude>Log4j2Plugins.dat</exclude>
+                                        <exclude>META-INF/log4j-provider.properties</exclude>
+                                        <!-- Exclude JUnit resources and classes -->
+                                        <exclude>junit/**</exclude>
+                                        <exclude>org/junit/**</exclude>
+                                        <!-- Exclude test-related resources -->
+                                        <exclude>assets/org/apache/commons/math3/exception/util/LocalizedFormats_*.properties</exclude>
+                                        <!-- Exclude cloud provider resource conflicts -->
+                                        <exclude>mime.types</exclude>
+                                        <exclude>dependencies.properties</exclude>
+                                        <exclude>azure-core.properties</exclude>
+                                        <exclude>azure-storage-blob.properties</exclude>
+                                        <!-- Exclude all javax classes to prevent conflicts -->
+                                        <exclude>javax/**</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
                                     <artifact>org.slf4j:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/services/**</exclude>
-                                    </excludes>
-                                </filter>
-                                <filter>
-                                    <artifact>io.netty:netty-all</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/io.netty.versions.properties</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
@@ -584,6 +617,12 @@
                                     <artifact>com.fasterxml.woodstox:woodstox-core</artifact>
                                     <excludes>
                                         <exclude>META-INF/services/**</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>jakarta.activation:jakarta.activation-api</artifact>
+                                    <excludes>
+                                        <exclude>pom.xml</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
@@ -620,46 +659,26 @@
                                     </excludes>
                                 </filter>
                                 <filter>
-                                    <artifact>org.apache.htrace:htrace-core4</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/services/com.fasterxml.jackson.*</exclude>
-                                    </excludes>
-                                </filter>
-                                <filter>
                                     <artifact>com.microsoft.azure:azure-data-lake-store-sdk</artifact>
                                     <excludes>
                                         <exclude>com/microsoft/azure/datalake/store/HttpTransport.class</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
-                                    <artifact>org.apache.hadoop:hadoop-common</artifact>
+                                    <artifact>io.hops:hadoop-common</artifact>
                                     <excludes>
                                         <exclude>*.h</exclude>
                                         <exclude>org/apache/hadoop/fs/FileSystem.class</exclude>
                                         <exclude>org/apache/hadoop/fs/FileSystem$*.class</exclude>
-                                        <exclude>org/apache/hadoop/util/LineReader.class</exclude>
+                                        <exclude>org/apache/hadoop/util/NativeCodeLoader.class</exclude>
+                                        <exclude>org/apache/hadoop/security/UserGroupInformation.class</exclude>
+                                        <exclude>org/apache/hadoop/security/UserGroupInformation$*.class</exclude>
                                         <exclude>org/apache/hadoop/crypto/key/kms/KMSClientProvider.class</exclude>
                                         <exclude>org/apache/hadoop/crypto/key/kms/KMSClientProvider$*.class</exclude>
-                                        <exclude>org/apache/hadoop/security/LdapGroupsMapping.class</exclude>
-                                        <exclude>org/apache/hadoop/security/LdapGroupsMapping$*.class</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
-                                    <artifact>org.apache.hadoop:hadoop-auth</artifact>
-                                    <excludes>
-                                        <exclude>org/apache/hadoop/security/authentication/util/KerberosUtil.class</exclude>
-                                        <exclude>org/apache/hadoop/security/authentication/util/KerberosUtil$*.class</exclude>
-                                    </excludes>
-                                </filter>
-                                <filter>
-                                    <artifact>org.apache.hadoop:hadoop-azure</artifact>
-                                    <excludes>
-                                        <exclude>org/apache/hadoop/fs/azurebfs/AzureBlobFileSystemStore.class</exclude>
-                                        <exclude>org/apache/hadoop/fs/azurebfs/AzureBlobFileSystemStore$*.class</exclude>
-                                    </excludes>
-                                </filter>
-                                <filter>
-                                    <artifact>org.apache.hadoop:hadoop-mapreduce-client-core</artifact>
+                                    <artifact>io.hops:hadoop-mapreduce-client-core</artifact>
                                     <excludes>
                                         <exclude>mapred-default.xml.orig</exclude>
                                     </excludes>
@@ -702,4 +721,18 @@
             </plugins>
         </pluginManagement>
     </build>
+    <repositories>
+      <repository>
+        <id>HopsEE</id>
+        <name>Hops Release Repository</name>
+        <url>https://nexus.hops.works/repository/hops-artifacts</url>
+        <releases>
+          <enabled>true</enabled>
+        </releases>
+        <snapshots>
+          <enabled>true</enabled>
+          <updatePolicy>interval:15</updatePolicy>
+        </snapshots>
+      </repository>
+    </repositories>
 </project>

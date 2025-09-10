@@ -861,7 +861,7 @@ public abstract class FileSystem extends Configured
         false,
         FS_TRASH_INTERVAL_DEFAULT,
         DataChecksum.Type.CRC32,
-        "");
+        false);
   }
 
   /**
