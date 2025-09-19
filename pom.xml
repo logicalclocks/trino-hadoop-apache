@@ -42,7 +42,7 @@
         <project.build.targetJdk>21</project.build.targetJdk>
         <shadeBase>io.trino.hadoop.\$internal</shadeBase>
         <dep.slf4j.version>1.7.36</dep.slf4j.version>
-        <dep.hadoop.version>3.2.0.17-EE-RC1</dep.hadoop.version>
+        <dep.hadoop.version>3.2.0.18-EE-SNAPSHOT</dep.hadoop.version>
     </properties>
 
     <dependencies>
@@ -720,8 +720,8 @@
                                     <shadedPattern>${shadeBase}.org.wildfly.openssl</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>com.google.protobuf</pattern>
-                                    <shadedPattern>${shadeBase}.com.google.protobuf</shadedPattern>
+                                    <pattern>org.apache.hadoop.hdfs.protocol.proto</pattern>
+                                    <shadedPattern>${shadeBase}.org.apache.hadoop.hdfs.protocol.proto</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.google.gson</pattern>
