@@ -668,10 +668,6 @@
         <configuration>
           <source>${project.build.targetJdk}</source>
           <target>${project.build.targetJdk}</target>
-          <compilerArgs>
-            <arg>--add-exports</arg>
-            <arg>java.base/sun.security.x509=ALL-UNNAMED</arg>
-          </compilerArgs>
         </configuration>
       </plugin>
 

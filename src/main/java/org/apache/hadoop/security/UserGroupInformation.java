@@ -101,7 +101,7 @@ import io.hops.security.UsersGroups;
 import org.apache.hadoop.thirdparty.com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.security.x509.X500Name;
+import javax.security.auth.x500.X500Principal;
 
 /**
  * User and group information for Hadoop.
@@ -196,6 +196,33 @@ public class UserGroupInformation {
       return null;
     }
 
+    /**
+     * Extract username from X500Principal by looking for L (Locality) or CN (Common Name).
+     * Note: simple comma split — does not handle RFC 2253 escaped commas. Hops keystore
+     * principals are controlled inputs, so this is safe here.
+     */
+    private String extractUsernameFromX500Principal(X500Principal principal) {
+      String dn = principal.getName();
+      String username = extractAttributeFromDN(dn, "L=");
+      if (username == null) {
+        username = extractAttributeFromDN(dn, "CN=");
+      }
+      return username;
+    }
+
+    private String extractAttributeFromDN(String dn, String attribute) {
+      int start = dn.indexOf(attribute);
+      if (start == -1) {
+        return null;
+      }
+      start += attribute.length();
+      int end = dn.indexOf(',', start);
+      if (end == -1) {
+        end = dn.length();
+      }
+      return dn.substring(start, end).trim();
+    }
+
     @Override
     public boolean commit() throws LoginException {
       LOG.debug("hadoop login commit");
@@ -225,16 +252,13 @@ public class UserGroupInformation {
           String subject = user.getName();
           LOG.debug("X500 subject is " + subject);
           try {
-            X500Name name = new X500Name(user.getName());
-            String username = name.getLocality();
-            if (username == null) {
-              username = name.getCommonName();
-            }
+            X500Principal principal = new X500Principal(user.getName());
+            String username = extractUsernameFromX500Principal(principal);
             if (username != null) {
               LOG.debug("New local user with username " + username);
               user = new User(username);
             }
-          } catch (IOException ex) {
+          } catch (IllegalArgumentException ex) {
             throw (LoginException)(new LoginException(ex.toString()).initCause(ex));
           }
         }
